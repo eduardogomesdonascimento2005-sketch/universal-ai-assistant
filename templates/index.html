@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IA Universal</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>IA Universal</h1>
+      <span>Agente com memória, arquivos e comandos</span>
+    </header>
+
+    <main class="chat-panel">
+      <div id="chat" class="chat" aria-live="polite"></div>
+
+      <form id="chat-form" class="composer">
+        <textarea id="prompt" rows="5" placeholder="Digite sua tarefa... Ex.: crie um arquivo chamado exemplo.txt com o texto hello"></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('chat-form');
+    const promptInput = document.getElementById('prompt');
+
+    function addMessage(role, text) {
+      const msg = document.createElement('div');
+      msg.className = `message ${role}`;
+      msg.innerHTML = `<strong>${role === 'user' ? 'Você' : 'IA'}:</strong><div>${text}</div>`;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const prompt = promptInput.value.trim();
+      if (!prompt) return;
+
+      addMessage('user', prompt);
+      promptInput.value = '';
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        addMessage('assistant', data.response || 'Sem resposta.');
+      } catch (error) {
+        addMessage('assistant', 'Erro ao processar a mensagem: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
