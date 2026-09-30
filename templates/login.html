@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | IA Profissional Real</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="login-box">
+    <h1>IA Profissional Real</h1>
+    <div class="field">
+      <label>Usuário</label>
+      <input id="username" type="text" placeholder="Digite seu usuário" />
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input id="password" type="password" placeholder="Digite sua senha" />
+    </div>
+    <div class="actions">
+      <button id="login-btn">Entrar</button>
+      <button id="register-btn" class="secondary">Registrar</button>
+    </div>
+  </div>
+
+  <script>
+    const usernameEl = document.getElementById('username');
+    const passwordEl = document.getElementById('password');
+
+    async function submit(action) {
+      const username = usernameEl.value.trim();
+      const password = passwordEl.value.trim();
+
+      if (!username || !password) {
+        alert('Preencha usuário e senha');
+        return;
+      }
+
+      const response = await fetch(`/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.detail || 'Erro');
+        return;
+      }
+
+      localStorage.setItem('ia_user', username);
+      window.location.href = '/';
+    }
+
+    document.getElementById('login-btn').addEventListener('click', () => submit('login'));
+    document.getElementById('register-btn').addEventListener('click', () => submit('register'));
+  </script>
+</body>
+</html>
